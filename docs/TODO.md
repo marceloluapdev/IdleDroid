@@ -17,7 +17,10 @@
 - [ ] Monstros revidando (vida do herói, derrota/recuo)
 - [ ] Itens: drop, inventário, equipamento (equipar = trecho novo)
 - [x] PiP nativo no app (MainActivity.java + JanelinhaPlugin.java): entra sozinho ao sair do app e pelo botão Janelinha
-- [ ] Notificação persistente com o progresso
+- [x] Modo flutuante (sobre outros apps): fundo vazado, ilha de chão, camadas em paralaxe, arrastar, tocar abre o jogo, notificação com Fechar
+- [ ] Modo flutuante: ajustar tamanho/posição salvos, toque atravessando a parte transparente, deixar o herói ainda maior
+- [ ] Notificação com o progresso (fase, ouro, abates)
+- [ ] Versão Play Store sem o modo flutuante, se a permissão for recusada na revisão
 - [ ] Portar `sim.js` + `player.js` para Kotlin e fazer o Live Wallpaper
 - [ ] Teste que compara a luta do JS com a do Kotlin (mesma semente → mesmos eventos)
 - [ ] Antes dos amigos: `ADMIN_PADRAO = false` em `src/admin.js` (esconder o menu ⚙)

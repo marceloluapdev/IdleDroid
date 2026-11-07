@@ -23,7 +23,10 @@
   function writeSave() {
     const v = fight.view;
     const s = { v: 1, seg: fight.seg, seen: { t: now(), gold: v.gold, kills: v.kills, level: v.level } };
-    try { localStorage.setItem(SAVE_KEY, JSON.stringify(s)); } catch (e) {}
+    const raw = JSON.stringify(s);
+    try { localStorage.setItem(SAVE_KEY, raw); } catch (e) {}
+    // No app, o modo flutuante lê o save por aqui (FlutuanteService.java)
+    if (nativo) Cap.nativePromise("Janelinha", "guardar", { save: raw, relogio: String(clockOffset) }).catch(() => {});
   }
 
   // ---------- Janelinha ----------
@@ -157,6 +160,27 @@
       alert("Janelinha não disponível neste navegador: " + e.message);
     }
   };
+
+  // ---------- Modo flutuante (só no app) ----------
+  // Herói por cima dos outros apps, com fundo vazado. Precisa de "Sobrepor a outros apps".
+  $("btn-flutuar").hidden = !nativo;
+  $("btn-flutuar").onclick = async () => {
+    try {
+      const r = await Cap.nativePromise("Janelinha", "flutuantePermitido", {});
+      if (!r || !r.permitido) { $("flut-perm").hidden = false; return; }
+      writeSave();
+      const raw = localStorage.getItem(SAVE_KEY);
+      await Cap.nativePromise("Janelinha", "flutuar", { save: raw, relogio: String(clockOffset) });
+    } catch (e) { alert("Modo flutuante falhou: " + e.message); }
+  };
+  $("flut-perm-ok").onclick = async () => {
+    $("flut-perm").hidden = true;
+    try {
+      await Cap.nativePromise("Janelinha", "pedirNotificacao", {});
+      await Cap.nativePromise("Janelinha", "pedirPermissaoFlutuante", {});
+    } catch (e) { alert("Não consegui abrir as configurações: " + e.message); }
+  };
+  $("flut-perm-nao").onclick = () => { $("flut-perm").hidden = true; };
 
   // ---------- Menu de administrador (?admin) ----------
   window.IdleAdmin = {

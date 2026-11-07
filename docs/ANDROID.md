@@ -9,6 +9,15 @@ wallpaper) entram depois em `android/`.
 - `JanelinhaPlugin.java`: o botão "Janelinha" do jogo chama `Capacitor.nativePromise("Janelinha", "entrar")`.
 - No jogo, `body.janelinha` esconde HUD e botões e deixa só o palco.
 
+## Modo flutuante (sobre outros apps)
+- `FlutuanteService.java`: serviço em primeiro plano (tipo specialUse) com uma janela `TYPE_APPLICATION_OVERLAY`
+  transparente; mostra `flutuante.html` num WebView (via WebViewAssetLoader). Arrastar move; tocar abre o jogo.
+- O save chega pela `Ponte` (SharedPreferences), gravado pelo jogo a cada salvamento (`Janelinha.guardar`).
+- Permissões: SYSTEM_ALERT_WINDOW (o usuário libera em "Sobrepor a outros apps"), FOREGROUND_SERVICE(_SPECIAL_USE),
+  POST_NOTIFICATIONS. Sem a permissão, o jogo oferece a Janelinha (PiP).
+- Ao voltar para o jogo (onResume) o modo flutuante fecha.
+- Play Store: a permissão de sobreposição tem de ser recurso divulgado na ficha e ter alternativa (a Janelinha).
+
 ## Como o APK é gerado
 - `npm run sync` copia o jogo (`index.html`, `src/`, `data/`, `assets/`) para `www/` e atualiza `android/`.
 - O GitHub Actions (`.github/workflows/apk.yml`) roda a cada envio na `dev` ou na `main`,

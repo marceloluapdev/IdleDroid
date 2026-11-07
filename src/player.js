@@ -31,11 +31,16 @@
   const clamp01 = x => x < 0 ? 0 : x > 1 ? 1 : x;
   const easeOut = p => 1 - (1 - p) * (1 - p);
 
-  function Player(canvas, data) {
+  // opts.transparente: modo flutuante (sobre outros apps). Sem fundo; no lugar dele,
+  // uma ilha de chão e camadas em paralaxe atrás e na frente da luta.
+  function Player(canvas, data, opts) {
+    this.opts = opts || {};
     this.data = data;
     this.pal = data.palette;
     this.canvas = canvas;
-    canvas.width = W; canvas.height = H;
+    // No modo flutuante corta o céu vazio de cima: a luta fica maior na mesma janela
+    this.cropY = this.opts.transparente ? 32 : 0;
+    canvas.width = W; canvas.height = H - this.cropY;
     this.g = canvas.getContext("2d");
     this.g.imageSmoothingEnabled = false;
     this.spells = {};
@@ -181,8 +186,9 @@
 
     g.save();
     g.clearRect(0, 0, W, H);
-    g.translate(sx, sy);
-    g.drawImage(this.background(stage), 0, 0);
+    g.translate(sx, sy - this.cropY);
+    if (this.opts.transparente) this.drawBackLayer(now, stage);
+    else g.drawImage(this.background(stage), 0, 0);
 
     // herói
     const hp = this.heroPos(now);
@@ -196,6 +202,7 @@
     for (const e of this.fx) if (this.drawFx(e, now, stage)) keep.push(e);
     this.fx = keep;
 
+    if (this.opts.transparente) this.drawFrontLayer(now, stage);
     g.restore();
     this.drawHud(now, view, stage);
   };
@@ -352,10 +359,91 @@
       this.ring(h.x + 6, h.y + 8, 4 + easeOut(clamp01(p * 3)) * 14, "amber", 1);
       const label = "NIVEL " + e.level;
       const bounce = Math.round(Math.abs(Math.sin(p * Math.PI * 3)) * 3 * (1 - p));
-      this.text(label, W / 2 - textW(label) / 2, 18 - bounce, "amber");
+      this.text(label, W / 2 - textW(label) / 2, 18 + this.cropY - bounce, "amber");
       return true;
     }
     return false;
+  };
+
+  // ---------- Modo flutuante: camadas em paralaxe ----------
+  // Faixa de enfeites (árvores, estalactites, lápides) que se repete na horizontal.
+  Player.prototype.decoStrip = function (stage, front) {
+    const key = stage.id + (front ? ":f" : ":b");
+    this.strips = this.strips || {};
+    if (this.strips[key]) return this.strips[key];
+    const b = stage.bg, P = this.pal, SWD = W * 2;
+    const c = document.createElement("canvas"); c.width = SWD; c.height = H;
+    const g = c.getContext("2d");
+    const px = (col, x, y, w = 1, h = 1) => { g.fillStyle = col; g.fillRect(x, y, w, h); };
+    const r = prng(stage.id.length * 131 + (front ? 7 : 3));
+    if (!front) {
+      // atrás: silhuetas menores, só na ilha
+      const col = P[b.decoColor] || P.ink;
+      for (let i = 0; i < 10; i++) {
+        const x = Math.floor(r() * SWD);
+        if (b.deco === "trees") {
+          const hgt = 14 + Math.floor(r() * 16);
+          for (let y = 0; y < hgt; y++) { const half = Math.floor((y / hgt) * 6) + 1; px(col, x - half, FLOOR - hgt + y, half * 2 + 1, 1); }
+        } else if (b.deco === "stalactites") {
+          const hgt = 6 + Math.floor(r() * 10);
+          for (let y = 0; y < hgt; y++) { const half = Math.floor((y / hgt) * 3); px(col, x - half, FLOOR - hgt + y, half * 2 + 1, 1); }
+        } else {
+          const hgt = 6 + Math.floor(r() * 5);
+          px(col, x, FLOOR - hgt, 6, hgt); px(col, x + 1, FLOOR - hgt - 1, 4, 1);
+        }
+      }
+    } else {
+      // na frente: tufos de grama/pedrinhas que passam rente ao chão
+      for (let i = 0; i < 16; i++) {
+        const x = Math.floor(r() * SWD), hgt = 2 + Math.floor(r() * 4);
+        for (let k = 0; k < 3; k++) px(k === 1 ? P[b.floorLine] : P[b.floor], x + k * 2, FLOOR + 3 - hgt + (k === 1 ? -1 : 0), 1, hgt + (k === 1 ? 1 : 0));
+      }
+    }
+    this.strips[key] = c;
+    return c;
+  };
+
+  Player.prototype.drawStrip = function (img, offset) {
+    const SWD = img.width;
+    const x = -(((offset % SWD) + SWD) % SWD);
+    this.g.drawImage(img, x, 0);
+    this.g.drawImage(img, x + SWD, 0);
+  };
+
+  // Ilha de chão (as pontas arredondadas deixam ver o que está atrás)
+  Player.prototype.drawIsland = function (stage) {
+    const b = stage.bg, x0 = 6, x1 = W - 6;
+    for (let y = FLOOR; y < FLOOR + 10; y++) {
+      const shrink = Math.floor(((y - FLOOR) / 10) ** 2 * 26);
+      this.px(y === FLOOR ? b.floorLine : b.floor, x0 + shrink, y, x1 - x0 - shrink * 2, 1);
+    }
+  };
+
+  Player.prototype.drawBackLayer = function (now, stage) {
+    const g = this.g;
+    g.save();
+    // corta as silhuetas para caberem só em cima da ilha
+    g.beginPath(); g.rect(10, 0, W - 20, FLOOR); g.clip();
+    g.globalAlpha = 0.85;
+    this.drawStrip(this.decoStrip(stage, false), now * 0.004);
+    g.restore();
+    this.drawIsland(stage);
+  };
+
+  Player.prototype.drawFrontLayer = function (now, stage) {
+    const g = this.g;
+    g.save();
+    g.beginPath(); g.rect(8, 0, W - 16, H); g.clip();
+    this.drawStrip(this.decoStrip(stage, true), now * 0.012);
+    g.restore();
+    // partículas flutuando na frente (folhas, poeira, brasas) pela cor da fase
+    const col = stage.bg.deco === "trees" ? "green" : stage.bg.deco === "graves" ? "lilac" : "gray";
+    for (let i = 0; i < 6; i++) {
+      const sp = 0.006 + i * 0.002;
+      const x = W - ((now * sp + i * 41) % (W + 20)) + 10;
+      const y = 20 + ((i * 23) % 50) + Math.sin(now / 600 + i) * 4;
+      this.px(col, x, y, i % 2 ? 1 : 2, 1);
+    }
   };
 
   Player.prototype.ring = function (cx, cy, r, col, step) {
@@ -379,6 +467,6 @@
     this.px("teal", HERO_X - 5, FLOOR + 7, Math.round(bw * Math.min(1, view.xp / need)), 1);
   };
 
-  Player.W = W; Player.H = H;
+  Player.W = W; Player.H = H; Player.H_FLUTUANTE = H - 32;
   root.Player = Player;
 })(window);

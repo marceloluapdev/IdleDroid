@@ -3,7 +3,7 @@
 Também roda os testes da simulação (node tests/sim.test.js).
 Adicione um caso_... para cada regra nova ou bug corrigido.
 """
-import functools, http.server, os, shutil, subprocess, sys, threading
+import functools, http.server, json, os, shutil, subprocess, sys, threading
 from playwright.sync_api import sync_playwright
 
 RAIZ = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -90,6 +90,37 @@ def caso_janelinha_mostra_so_a_luta(p):
     assert p.is_visible("#stage")
     p.evaluate("""() => { const e = new Event('janelinha'); e.ativa = false; window.dispatchEvent(e); }""")
     assert p.is_visible(".hud")
+
+
+def caso_flutuar_so_aparece_no_app(p):
+    assert p.is_hidden("#btn-flutuar")
+
+
+def caso_tela_flutuante_tem_fundo_vazado(p):
+    # usa o save do jogo, como a Ponte nativa faria
+    p.evaluate("IdleAdmin.skip(10 * 60e3)")
+    p.wait_for_timeout(200)
+    raw = p.evaluate("localStorage.getItem('idle.save')")
+    ctx = p.context
+    f = ctx.new_page()
+    erros = []
+    f.on("pageerror", lambda e: erros.append(str(e)))
+    f.add_init_script("window.Ponte = { save: () => %s, relogio: () => localStorage.getItem('idle.relogio') || '0' };" % json.dumps(raw))
+    f.goto(p.url.split("?")[0].rstrip("/") + "/flutuante.html")
+    f.wait_for_function("window.IdleFlutuante && IdleFlutuante.fight")
+    f.wait_for_timeout(600)
+    info = f.evaluate("""() => {
+      const c = document.getElementById('stage'), g = c.getContext('2d');
+      const d = g.getImageData(0, 0, c.width, c.height).data;
+      let transp = 0, cheio = 0;
+      for (let i = 3; i < d.length; i += 4) (d[i] === 0 ? transp++ : cheio++);
+      return { w: c.width, h: c.height, transp, cheio, alfaCanto: g.getImageData(c.width - 2, 20, 1, 1).data[3] };
+    }""")
+    assert not erros, erros
+    assert info["w"] == 160 and info["h"] == 68, info
+    assert info["transp"] > 2000 and info["cheio"] > 1000, info
+    assert info["alfaCanto"] == 0, "o canto devia ser transparente"
+    f.close()
 
 
 def main():

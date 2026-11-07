@@ -30,6 +30,7 @@
     <nav class="buttons">
       <button id="btn-stages">Fases</button>
       <button id="btn-pip" hidden>Janelinha</button>
+      <button id="btn-flutuar" hidden>Flutuar</button>
     </nav>
   </main>
 
@@ -50,9 +51,19 @@
     </div>
   </div>
 
+  <div id="flut-perm" class="overlay" hidden>
+    <div class="overlay-box">
+      <h2>Herói flutuante</h2>
+      <p>Para o herói lutar por cima dos outros apps, libere <b>Sobrepor a outros apps</b> para o IdleDroid na próxima tela.</p>
+      <p class="away-time">Depois é só voltar e tocar em Flutuar de novo. Sem a permissão, a Janelinha continua funcionando.</p>
+      <button id="flut-perm-ok">Abrir configurações</button>
+      <button id="flut-perm-nao" class="secondary">Agora não</button>
+    </div>
+  </div>
+
   <script src="src/sim.js?v=1"></script>
-  <script src="src/player.js?v=1"></script>
-  <script src="src/main.js?v=2"></script>
+  <script src="src/player.js?v=2"></script>
+  <script src="src/main.js?v=3"></script>
   <!-- Menu de administrador: só com ?admin no endereço -->
   <script src="src/admin.js?v=3"></script>
 </body>
