@@ -51,6 +51,11 @@ Jogo idle de grind para celular (Android), com troca de itens entre jogadores nu
 - Fases: Floresta Úmida (Gosma, nv 1), Caverna Ecoante (Morcego, nv 4), Cripta Esquecida (Esqueleto, nv 8).
 - Magias: Faísca (nv 1), Bola de Fogo (2), Raio (3), Estilhaço de Gelo (5, 3 acertos), Nova Arcana (7).
 
+## Modo flutuante (visual)
+- Baseado no desenho do Marcel: personagens no chão, cerca baixa na frente (só os pés), mato perto do herói,
+  contorno de montanha bem ao fundo; o meio entre os grupos fica vazado.
+- Meta futura: até 3 heróis contra 3 inimigos na cena (ir ajustando nos testes).
+
 ## Em aberto
 - Backend do hub de trocas (Cloudflare Workers + D1/Durable Objects é candidato).
 - Economia de itens, equipamentos e prevenção de trapaça.

@@ -9,6 +9,7 @@
   "use strict";
 
   const W = 160, H = 100, FLOOR = 84;
+  const H_FLUT = 52;   // altura do palco no modo flutuante (y 38 a 90)
   const HERO_X = 22;
   const MON_X = 120;
 
@@ -39,8 +40,8 @@
     this.pal = data.palette;
     this.canvas = canvas;
     // No modo flutuante corta o céu vazio de cima: a luta fica maior na mesma janela
-    this.cropY = this.opts.transparente ? 32 : 0;
-    canvas.width = W; canvas.height = H - this.cropY;
+    this.cropY = this.opts.transparente ? 38 : 0;
+    canvas.width = W; canvas.height = this.opts.transparente ? H_FLUT : H;
     this.g = canvas.getContext("2d");
     this.g.imageSmoothingEnabled = false;
     this.spells = {};
@@ -365,39 +366,31 @@
     return false;
   };
 
-  // ---------- Modo flutuante: camadas em paralaxe ----------
-  // Faixa de enfeites (árvores, estalactites, lápides) que se repete na horizontal.
-  Player.prototype.decoStrip = function (stage, front) {
-    const key = stage.id + (front ? ":f" : ":b");
+  // ---------- Modo flutuante: camadas (desenho do Marcel) ----------
+  // Fundo: montanha bem atrás, passando devagar. Chão só embaixo do herói e do monstro
+  // (o meio fica vazado). Frente: cerca de madeira e mato perto do herói.
+  const CERCA_HEROI = [4, 60];                 // trecho de cerca na frente do herói
+  const CERCA_MONSTRO = [[96, 108], [133, 157]]; // dos lados do monstro (não cobre ele)
+
+  Player.prototype.mountains = function (stage) {
     this.strips = this.strips || {};
+    const key = stage.id + ":m";
     if (this.strips[key]) return this.strips[key];
-    const b = stage.bg, P = this.pal, SWD = W * 2;
+    const SWD = W * 2, P = this.pal;
     const c = document.createElement("canvas"); c.width = SWD; c.height = H;
     const g = c.getContext("2d");
-    const px = (col, x, y, w = 1, h = 1) => { g.fillStyle = col; g.fillRect(x, y, w, h); };
-    const r = prng(stage.id.length * 131 + (front ? 7 : 3));
-    if (!front) {
-      // atrás: silhuetas menores, só na ilha
-      const col = P[b.decoColor] || P.ink;
-      for (let i = 0; i < 10; i++) {
-        const x = Math.floor(r() * SWD);
-        if (b.deco === "trees") {
-          const hgt = 14 + Math.floor(r() * 16);
-          for (let y = 0; y < hgt; y++) { const half = Math.floor((y / hgt) * 6) + 1; px(col, x - half, FLOOR - hgt + y, half * 2 + 1, 1); }
-        } else if (b.deco === "stalactites") {
-          const hgt = 6 + Math.floor(r() * 10);
-          for (let y = 0; y < hgt; y++) { const half = Math.floor((y / hgt) * 3); px(col, x - half, FLOOR - hgt + y, half * 2 + 1, 1); }
-        } else {
-          const hgt = 6 + Math.floor(r() * 5);
-          px(col, x, FLOOR - hgt, 6, hgt); px(col, x + 1, FLOOR - hgt - 1, 4, 1);
-        }
-      }
-    } else {
-      // na frente: tufos de grama/pedrinhas que passam rente ao chão
-      for (let i = 0; i < 16; i++) {
-        const x = Math.floor(r() * SWD), hgt = 2 + Math.floor(r() * 4);
-        for (let k = 0; k < 3; k++) px(k === 1 ? P[b.floorLine] : P[b.floor], x + k * 2, FLOOR + 3 - hgt + (k === 1 ? -1 : 0), 1, hgt + (k === 1 ? 1 : 0));
-      }
+    const r = prng(stage.id.length * 53 + 11);
+    const a = [r() * 6, r() * 6, r() * 6];
+    for (let x = 0; x < SWD; x++) {
+      // soma de ondas que fecha certinho no fim da faixa (repete sem emenda)
+      const t = (x / SWD) * Math.PI * 2;
+      const h = 9 + Math.sin(t * 2 + a[0]) * 5 + Math.sin(t * 5 + a[1]) * 3 + Math.sin(t * 9 + a[2]) * 1.5;
+      const top = Math.round(FLOOR - 2 - h);
+      // só o contorno da serra + um pontilhado logo abaixo: o resto fica vazado
+      g.fillStyle = P.violet; g.fillRect(x, top, 1, 2);
+      g.fillStyle = P.dusk;
+      for (let y = top + 2; y < top + 6; y++) if ((x + y) % (y - top < 4 ? 2 : 3) === 0) g.fillRect(x, y, 1, 1);
+      if (h > 14) { g.fillStyle = P.bone; g.fillRect(x, top, 1, 1); } // neve no pico
     }
     this.strips[key] = c;
     return c;
@@ -405,43 +398,58 @@
 
   Player.prototype.drawStrip = function (img, offset) {
     const SWD = img.width;
-    const x = -(((offset % SWD) + SWD) % SWD);
+    const x = -Math.round(((offset % SWD) + SWD) % SWD);
     this.g.drawImage(img, x, 0);
     this.g.drawImage(img, x + SWD, 0);
   };
 
-  // Ilha de chão (as pontas arredondadas deixam ver o que está atrás)
-  Player.prototype.drawIsland = function (stage) {
-    const b = stage.bg, x0 = 6, x1 = W - 6;
-    for (let y = FLOOR; y < FLOOR + 10; y++) {
-      const shrink = Math.floor(((y - FLOOR) / 10) ** 2 * 26);
-      this.px(y === FLOOR ? b.floorLine : b.floor, x0 + shrink, y, x1 - x0 - shrink * 2, 1);
+  Player.prototype.drawGround = function (stage, x0, x1) {
+    const b = stage.bg;
+    this.px(b.floorLine, x0, FLOOR, x1 - x0, 1);
+    this.px(b.floor, x0, FLOOR + 1, x1 - x0, 3);
+    this.px(b.floor, x0 + 2, FLOOR + 4, x1 - x0 - 4, 1);
+  };
+
+  // Cerca baixa: só cobre os pés (estacas de 5 px, uma tábua fina)
+  Player.prototype.drawFence = function (x0, x1) {
+    const top = FLOOR - 3;
+    this.px("wood", x0, top + 2, x1 - x0, 1);
+    for (let x = x0; x <= x1 - 1; x += 9) {
+      this.px("ink", x - 1, top - 1, 3, 7);
+      this.px("wood", x, top, 1, 5);
     }
   };
 
   Player.prototype.drawBackLayer = function (now, stage) {
     const g = this.g;
     g.save();
-    // corta as silhuetas para caberem só em cima da ilha
-    g.beginPath(); g.rect(10, 0, W - 20, FLOOR); g.clip();
-    g.globalAlpha = 0.85;
-    this.drawStrip(this.decoStrip(stage, false), now * 0.004);
+    // a montanha some nas pontas, para não virar um retângulo
+    g.beginPath(); g.rect(2, 0, W - 4, FLOOR); g.clip();
+    this.drawStrip(this.mountains(stage), now * 0.003);
     g.restore();
-    this.drawIsland(stage);
+    this.drawGround(stage, 2, 64);
+    this.drawGround(stage, 92, 158);
   };
 
   Player.prototype.drawFrontLayer = function (now, stage) {
-    const g = this.g;
-    g.save();
-    g.beginPath(); g.rect(8, 0, W - 16, H); g.clip();
-    this.drawStrip(this.decoStrip(stage, true), now * 0.012);
-    g.restore();
-    // partículas flutuando na frente (folhas, poeira, brasas) pela cor da fase
+    // mato perto do herói, balançando
+    const sway = Math.round(Math.sin(now / 500));
+    const tufos = [[6, 6], [12, 4], [40, 5], [46, 7], [53, 4], [99, 4], [150, 5]];
+    for (const [x, h] of tufos) {
+      for (let k = 0; k < 3; k++) {
+        const hh = h - (k === 1 ? 0 : 2);
+        this.px(k === 1 ? "green" : "greenD", x + k * 2 + (k === 1 ? sway : 0), FLOOR + 2 - hh, 1, hh);
+      }
+    }
+    // cerca na frente
+    this.drawFence(CERCA_HEROI[0], CERCA_HEROI[1]);
+    for (const [a, b] of CERCA_MONSTRO) this.drawFence(a, b);
+    // folhas/poeira passando na frente
     const col = stage.bg.deco === "trees" ? "green" : stage.bg.deco === "graves" ? "lilac" : "gray";
-    for (let i = 0; i < 6; i++) {
+    for (let i = 0; i < 5; i++) {
       const sp = 0.006 + i * 0.002;
       const x = W - ((now * sp + i * 41) % (W + 20)) + 10;
-      const y = 20 + ((i * 23) % 50) + Math.sin(now / 600 + i) * 4;
+      const y = FLOOR - 26 + ((i * 7) % 18) + Math.sin(now / 600 + i) * 3;
       this.px(col, x, y, i % 2 ? 1 : 2, 1);
     }
   };
@@ -467,6 +475,6 @@
     this.px("teal", HERO_X - 5, FLOOR + 7, Math.round(bw * Math.min(1, view.xp / need)), 1);
   };
 
-  Player.W = W; Player.H = H; Player.H_FLUTUANTE = H - 32;
+  Player.W = W; Player.H = H; Player.H_FLUTUANTE = H_FLUT;
   root.Player = Player;
 })(window);

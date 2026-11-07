@@ -114,7 +114,7 @@ public class FlutuanteService extends Service {
         wm = (WindowManager) getSystemService(WINDOW_SERVICE);
         DisplayMetrics dm = getResources().getDisplayMetrics();
         int largura = (int) (Math.min(dm.widthPixels, dm.heightPixels) * 0.9f);
-        int altura = largura * 68 / 160; // proporção do palco flutuante (160x68)
+        int altura = largura * 52 / 160; // proporção do palco flutuante (160x52, Player.H_FLUTUANTE)
         int tipo = Build.VERSION.SDK_INT >= Build.VERSION_CODES.O
             ? WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY
             : WindowManager.LayoutParams.TYPE_PHONE;

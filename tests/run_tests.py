@@ -114,11 +114,11 @@ def caso_tela_flutuante_tem_fundo_vazado(p):
       const d = g.getImageData(0, 0, c.width, c.height).data;
       let transp = 0, cheio = 0;
       for (let i = 3; i < d.length; i += 4) (d[i] === 0 ? transp++ : cheio++);
-      return { w: c.width, h: c.height, transp, cheio, alfaCanto: g.getImageData(c.width - 2, 20, 1, 1).data[3] };
+      return { w: c.width, h: c.height, transp, cheio, alfaCanto: g.getImageData(c.width - 1, 2, 1, 1).data[3] };
     }""")
     assert not erros, erros
-    assert info["w"] == 160 and info["h"] == 68, info
-    assert info["transp"] > 2000 and info["cheio"] > 1000, info
+    assert info["w"] == 160 and info["h"] == 52, info
+    assert info["transp"] > 1500 and info["cheio"] > 1000, info
     assert info["alfaCanto"] == 0, "o canto devia ser transparente"
     f.close()
 
