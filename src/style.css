@@ -66,3 +66,8 @@ button.secondary { background: var(--dusk); color: var(--bone); box-shadow: inse
 .admin-menu { display: flex; flex-direction: column; gap: 4px; }
 .admin-menu[hidden] { display: none; }
 .admin-menu button { padding: 8px 10px; font-size: 11px; background: var(--lilac); box-shadow: none; }
+
+/* Janelinha (PiP nativo): só o palco da luta, ocupando a janela inteira */
+body.janelinha main { padding: 0; gap: 0; max-width: none; height: 100vh; justify-content: center; }
+body.janelinha .hud, body.janelinha .buttons, body.janelinha .admin, body.janelinha .overlay { display: none !important; }
+body.janelinha .stage { border: 0; width: 100vw; height: 100vh; aspect-ratio: auto; object-fit: contain; }

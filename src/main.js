@@ -26,10 +26,13 @@
     try { localStorage.setItem(SAVE_KEY, JSON.stringify(s)); } catch (e) {}
   }
 
-  // ---------- Janelinha (experimento só web) ----------
-  // canvas -> vídeo -> Picture-in-Picture. No app de verdade isso vira PiP nativo.
+  // ---------- Janelinha ----------
+  // No app Android: PiP nativo (MainActivity.java + JanelinhaPlugin.java).
+  // No navegador: experimento canvas -> vídeo -> Picture-in-Picture.
+  const Cap = window.Capacitor;
+  const nativo = !!(Cap && Cap.isNativePlatform && Cap.isNativePlatform() && Cap.nativePromise);
   const pip = {
-    on: false, big: null, g: null, video: null,
+    on: false, nativa: false, big: null, g: null, video: null,
     copy() { this.g.drawImage($("stage"), 0, 0, this.big.width, this.big.height); },
   };
   const player = new Player($("stage"), data);
@@ -63,13 +66,13 @@
     const t = now();
     player.onEvents(fight.update(t), t);
     player.draw(t, fight.view);
-    if (pip.on) pip.copy();
+    if (pip.on && pip.big) pip.copy();
     hud();
     if (t - lastSave > 5000 && !leaving) { writeSave(); lastSave = t; }
   }
   (function raf() { if (!document.hidden) frame(); requestAnimationFrame(raf); })();
   // Com a aba escondida o requestAnimationFrame para; a janelinha continua por timer.
-  setInterval(() => { if (document.hidden && pip.on) frame(); }, 1000 / 20);
+  setInterval(() => { if (document.hidden && (pip.on || pip.nativa)) frame(); }, 1000 / 20);
   document.addEventListener("visibilitychange", () => { if (document.hidden && !leaving) writeSave(); });
   window.addEventListener("pagehide", () => { if (!leaving) writeSave(); });
 
@@ -118,9 +121,23 @@
   }
   $("away-ok").onclick = () => { $("away").hidden = true; };
 
-  const canPip = document.pictureInPictureEnabled && HTMLCanvasElement.prototype.captureStream;
+  // O app avisa quando entra/sai da janelinha: só o palco da luta fica na tela
+  window.addEventListener("janelinha", ev => {
+    pip.nativa = !!ev.ativa;
+    document.body.classList.toggle("janelinha", pip.nativa);
+    if (!pip.nativa) writeSave();
+  });
+
+  const canPip = nativo || (document.pictureInPictureEnabled && HTMLCanvasElement.prototype.captureStream);
   $("btn-pip").hidden = !canPip;
   $("btn-pip").onclick = async () => {
+    if (nativo) {
+      try {
+        const r = await Cap.nativePromise("Janelinha", "entrar", {});
+        if (!r || !r.entrou) alert("Este celular não permite a janelinha (veja se está liberada nas configurações do app).");
+      } catch (e) { alert("Janelinha falhou: " + e.message); }
+      return;
+    }
     try {
       if (document.pictureInPictureElement) { await document.exitPictureInPicture(); return; }
       if (!pip.big) {

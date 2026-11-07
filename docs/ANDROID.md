@@ -3,6 +3,12 @@
 O app é o mesmo jogo da web dentro de um WebView (Capacitor). Partes nativas (PiP, notificação,
 wallpaper) entram depois em `android/`.
 
+## Janelinha (PiP)
+- `android/app/src/main/java/.../MainActivity.java`: entra na janelinha ao sair do app (Android 12+ automático;
+  até o 11 pelo botão home), mantém o WebView desenhando e avisa o jogo com o evento `janelinha` ({ativa}).
+- `JanelinhaPlugin.java`: o botão "Janelinha" do jogo chama `Capacitor.nativePromise("Janelinha", "entrar")`.
+- No jogo, `body.janelinha` esconde HUD e botões e deixa só o palco.
+
 ## Como o APK é gerado
 - `npm run sync` copia o jogo (`index.html`, `src/`, `data/`, `assets/`) para `www/` e atualiza `android/`.
 - O GitHub Actions (`.github/workflows/apk.yml`) roda a cada envio na `dev` ou na `main`,

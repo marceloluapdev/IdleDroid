@@ -16,7 +16,7 @@
 - [ ] Limite de ganho offline e balanceamento de XP/ouro
 - [ ] Monstros revidando (vida do herói, derrota/recuo)
 - [ ] Itens: drop, inventário, equipamento (equipar = trecho novo)
-- [ ] PiP nativo no app
+- [x] PiP nativo no app (MainActivity.java + JanelinhaPlugin.java): entra sozinho ao sair do app e pelo botão Janelinha
 - [ ] Notificação persistente com o progresso
 - [ ] Portar `sim.js` + `player.js` para Kotlin e fazer o Live Wallpaper
 - [ ] Teste que compara a luta do JS com a do Kotlin (mesma semente → mesmos eventos)

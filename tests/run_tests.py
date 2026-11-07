@@ -82,6 +82,16 @@ def caso_admin_visivel_por_padrao_e_sete_toques_alternam(p):
     assert p.locator(".admin").count() == 0, "7 toques deveriam desligar"
 
 
+def caso_janelinha_mostra_so_a_luta(p):
+    # simula o aviso que o app Android manda ao entrar/sair da janelinha
+    p.evaluate("""() => { const e = new Event('janelinha'); e.ativa = true; window.dispatchEvent(e); }""")
+    assert p.evaluate("document.body.classList.contains('janelinha')")
+    assert p.is_hidden(".hud") and p.is_hidden(".buttons")
+    assert p.is_visible("#stage")
+    p.evaluate("""() => { const e = new Event('janelinha'); e.ativa = false; window.dispatchEvent(e); }""")
+    assert p.is_visible(".hud")
+
+
 def main():
     r = subprocess.run(["node", os.path.join(RAIZ, "tests/sim.test.js")], capture_output=True, text=True)
     print(r.stdout.strip().splitlines()[-1])
