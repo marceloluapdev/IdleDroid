@@ -1,0 +1,153 @@
+{
+  "_comentario": "Conteúdo do jogo. Lido pelo JS (app/PiP) e, no futuro, pelo Kotlin (wallpaper). Sprites são grades de caracteres; cada caractere aponta para uma cor da paleta ('.' = transparente).",
+
+  "palette": {
+    "ink": "#14101f", "night": "#221a36", "dusk": "#33284f", "violet": "#4f3d75", "lilac": "#8a74c4",
+    "bone": "#f4ead0", "skin": "#e7b48a", "amber": "#f5b94a", "orange": "#e2702c", "red": "#d0455a",
+    "green": "#5bb35f", "greenD": "#2f6e3f", "teal": "#4fb3b0", "ice": "#bfeaf5", "blue": "#4f7fd0",
+    "wood": "#7a4a1c", "gray": "#8a8aa0", "grayD": "#4a4a60", "white": "#ffffff"
+  },
+
+  "hero": {
+    "name": "Aprendiz",
+    "sprite": {
+      "colors": { "p": "violet", "P": "lilac", "s": "skin", "e": "ink", "r": "blue", "R": "amber", "w": "wood", "g": "teal", "k": "ink" },
+      "rows": [
+        "....pp.......",
+        "...pPPp......",
+        "..pPPPPp...g.",
+        ".pppppppp.ggg",
+        "...ssss....w.",
+        "...sese....w.",
+        "...ssss....w.",
+        "..rrrrrr..sw.",
+        ".rrRrrRrrrrw.",
+        ".rrrrrrrr..w.",
+        "..rrrrrr...w.",
+        "..rrRRrr...w.",
+        "..rrrrrr...w.",
+        ".rrrrrrrr..w.",
+        "..kk..kk.....",
+        ".kkk..kkk...."
+      ],
+      "staffTip": [11, 2]
+    }
+  },
+
+  "monsters": {
+    "slime": {
+      "name": "Gosma", "idle": "squish", "hover": 0,
+      "sprite": {
+        "colors": { "g": "green", "G": "greenD", "w": "white", "e": "ink" },
+        "rows": [
+          ".....gggg.....",
+          "...gggggggg...",
+          "..gwwggggggg..",
+          ".gwgggggggggg.",
+          ".gggeggggegg..",
+          "gggeegggeeggg.",
+          "gggggggggggggg",
+          "gGgggggggggGgg",
+          ".GGGGGGGGGGGG."
+        ]
+      }
+    },
+    "bat": {
+      "name": "Morcego", "idle": "flap", "hover": 16,
+      "sprite": {
+        "colors": { "v": "violet", "V": "dusk", "r": "red", "w": "bone" },
+        "rows": [
+          "v.....vv.....v",
+          "vv...vvvv...vv",
+          "vvv.vvvvvv.vvv",
+          "vVvvvrvvrvvvVv",
+          "VVvvvvvvvvvvVV",
+          ".V.vvwvvwvv.V.",
+          "....vvvvvv....",
+          ".....v..v....."
+        ]
+      }
+    },
+    "skeleton": {
+      "name": "Esqueleto", "idle": "sway", "hover": 0,
+      "sprite": {
+        "colors": { "b": "bone", "k": "ink", "g": "gray", "r": "red" },
+        "rows": [
+          "....bbbb....",
+          "...bbbbbb...",
+          "...bkbbkb...",
+          "...brbbrb...",
+          "....bkkb....",
+          ".....bb.....",
+          "..bbbbbbbb..",
+          ".b..bkkb..b.",
+          ".b..bbbb..b.",
+          "g...bkkb...g",
+          "....bbbb....",
+          "....b..b....",
+          "....b..b....",
+          "...bb..bb..."
+        ]
+      }
+    }
+  },
+
+  "stages": [
+    {
+      "id": "floresta", "name": "Floresta Úmida", "monster": "slime", "minLevel": 1, "levelCap": 6,
+      "hp": 30, "hpPerLevel": 0, "gold": 2, "xp": 3,
+      "bg": { "top": "night", "bottom": "dusk", "floor": "greenD", "floorLine": "green", "deco": "trees", "decoColor": "ink" }
+    },
+    {
+      "id": "caverna", "name": "Caverna Ecoante", "monster": "bat", "minLevel": 4, "levelCap": 11,
+      "hp": 90, "hpPerLevel": 0, "gold": 6, "xp": 8,
+      "bg": { "top": "ink", "bottom": "night", "floor": "grayD", "floorLine": "gray", "deco": "stalactites", "decoColor": "dusk" }
+    },
+    {
+      "id": "cripta", "name": "Cripta Esquecida", "monster": "skeleton", "minLevel": 8, "levelCap": 18,
+      "hp": 260, "hpPerLevel": 0, "gold": 18, "xp": 20,
+      "bg": { "top": "ink", "bottom": "violet", "floor": "dusk", "floorLine": "lilac", "deco": "graves", "decoColor": "grayD" }
+    }
+  ],
+
+  "spells": [
+    {
+      "id": "faisca", "name": "Faísca", "minLevel": 1, "weight": 6, "mult": 1.0,
+      "castMs": 350, "travelMs": 380, "recoverMs": 450,
+      "visual": { "kind": "projectile", "color": "teal", "color2": "white", "size": 2, "arc": 6, "trail": 4,
+                  "impact": { "particles": 6, "radius": 6, "ms": 260, "shake": 0, "flash": false } }
+    },
+    {
+      "id": "bola-de-fogo", "name": "Bola de Fogo", "minLevel": 2, "weight": 3, "mult": 2.2,
+      "castMs": 600, "travelMs": 520, "recoverMs": 500,
+      "visual": { "kind": "projectile", "color": "orange", "color2": "amber", "size": 4, "arc": 14, "trail": 8,
+                  "impact": { "particles": 16, "radius": 14, "ms": 450, "shake": 2, "flash": true } }
+    },
+    {
+      "id": "raio", "name": "Raio", "minLevel": 3, "weight": 2, "mult": 2.8,
+      "castMs": 700, "travelMs": 120, "recoverMs": 600,
+      "visual": { "kind": "beam", "color": "ice", "color2": "white", "size": 1,
+                  "impact": { "particles": 10, "radius": 10, "ms": 350, "shake": 3, "flash": true } }
+    },
+    {
+      "id": "estilhaco", "name": "Estilhaço de Gelo", "minLevel": 5, "weight": 2, "mult": 1.5,
+      "castMs": 450, "travelMs": 300, "recoverMs": 400, "hits": 3, "hitGapMs": 110,
+      "visual": { "kind": "projectile", "color": "ice", "color2": "blue", "size": 2, "arc": 3, "trail": 5,
+                  "impact": { "particles": 5, "radius": 6, "ms": 220, "shake": 1, "flash": false } }
+    },
+    {
+      "id": "nova-arcana", "name": "Nova Arcana", "minLevel": 7, "weight": 1, "mult": 5.0,
+      "castMs": 1000, "travelMs": 0, "recoverMs": 700,
+      "visual": { "kind": "nova", "color": "lilac", "color2": "white", "size": 3,
+                  "impact": { "particles": 24, "radius": 22, "ms": 600, "shake": 4, "flash": true } }
+    }
+  ],
+
+  "rules": {
+    "baseAttack": 6, "attackPerLevel": 3,
+    "critChance": 0.12, "critMult": 2.0,
+    "respawnMs": 900,
+    "xpToLevel": { "base": 15, "exp": 1.8 },
+    "_levelCap": "acima do levelCap da fase, cada abate dá só 1 de XP"
+  }
+}

@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+  <meta name="theme-color" content="#14101f">
+  <title>IdleDroid</title>
+  <link rel="icon" href="data:,">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Silkscreen:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="src/style.css?v=1">
+</head>
+<body>
+  <main>
+    <header class="hud">
+      <div class="hud-row">
+        <span id="stage-name" class="stage-name"></span>
+        <span class="gold"><i class="coin"></i><span id="gold">0</span></span>
+      </div>
+      <div class="hud-row small">
+        <span>Nível <b id="level">1</b></span>
+        <span>Abates <b id="kills">0</b></span>
+      </div>
+      <div class="bar"><div id="xp-fill" class="fill"></div><span id="xp-text"></span></div>
+    </header>
+
+    <!-- Palco da luta: 160x100 pixels ampliados sem borrar (src/player.js) -->
+    <canvas id="stage" class="stage"></canvas>
+
+    <nav class="buttons">
+      <button id="btn-stages">Fases</button>
+      <button id="btn-pip" hidden>Janelinha</button>
+    </nav>
+  </main>
+
+  <div id="stages" class="overlay" hidden>
+    <div class="overlay-box">
+      <h2>Escolha a fase</h2>
+      <div id="stage-list" class="stage-list"></div>
+      <button id="stages-close" class="secondary">Fechar</button>
+    </div>
+  </div>
+
+  <div id="away" class="overlay" hidden>
+    <div class="overlay-box">
+      <h2>Enquanto você estava fora</h2>
+      <p class="away-time" id="away-time"></p>
+      <p id="away-text"></p>
+      <button id="away-ok">Coletar</button>
+    </div>
+  </div>
+
+  <script src="src/sim.js?v=1"></script>
+  <script src="src/player.js?v=1"></script>
+  <script src="src/main.js?v=1"></script>
+  <!-- Menu de administrador: só com ?admin no endereço -->
+  <script src="src/admin.js?v=1"></script>
+</body>
+</html>
