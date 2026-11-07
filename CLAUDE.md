@@ -29,6 +29,7 @@ App Android: `android/` é gerado pelo Capacitor (só edite o nativo de propósi
 não precisa fazer nada: o Actions roda `npm run sync` e gera o APK. Não crie arquivos dentro de `www/`.
 
 Teste manual no celular: abra com `?admin` (fica ligado no aparelho; `?admin=off` desliga).
+No app Android: 7 toques rápidos em "Nível" ligam/desligam o menu.
 Ao criar mecânica nova, adicione um atalho no menu de `src/admin.js`.
 
 Ao mudar CSS/JS/JSON, aumente o `?v=N` deles no `index.html` (e o do `fetch` em `main.js` para o JSON).

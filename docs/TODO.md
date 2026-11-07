@@ -8,6 +8,7 @@
 - [x] Escolha de fase (liberada por nível)
 - [x] Menu `?admin`: avançar tempo, sair por 8 h, zerar
 - [x] Experimento de janelinha (PiP) só com web
+- [x] Menu de teste no app: 7 toques em "Nível"
 - [x] App Android com Capacitor + APK assinado gerado pelo GitHub Actions (ver ANDROID.md)
 
 ## Próximos

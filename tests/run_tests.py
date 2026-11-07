@@ -70,6 +70,17 @@ def caso_save_sobrevive_ao_recarregar(p):
     assert depois["gold"] >= antes["gold"] and depois["level"] >= antes["level"], (antes, depois)
 
 
+def caso_sete_toques_em_nivel_ligam_o_admin(p):
+    p.evaluate("localStorage.removeItem('idle.admin')")
+    p.goto(p.url.split("?")[0])
+    p.wait_for_function("window.IdleAdmin && IdleAdmin.fight")
+    assert p.locator(".admin").count() == 0
+    for _ in range(7):
+        p.click(".hud-row.small span >> nth=0")
+    p.wait_for_function("window.IdleAdmin && IdleAdmin.fight")
+    p.wait_for_selector(".admin")
+
+
 def main():
     r = subprocess.run(["node", os.path.join(RAIZ, "tests/sim.test.js")], capture_output=True, text=True)
     print(r.stdout.strip().splitlines()[-1])
