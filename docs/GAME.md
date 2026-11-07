@@ -46,6 +46,7 @@ Jogo idle de grind para celular (Android), com troca de itens entre jogadores nu
 - Experimento só web (já no jogo): botão **Janelinha** = canvas → `captureStream()` → `<video>` → PiP.
 
 ## Regras atuais (protótipo)
+- Pausa entre monstros (caminhada): 2 s.
 - Ataque = 6 + 3 por nível. Crítico 12% (×2). Dano varia ±10%.
 - XP para subir: 15 × nível^1.8. Acima do `levelCap` da fase, cada abate dá só 1 XP.
 - Fases: Floresta Úmida (Gosma, nv 1), Caverna Ecoante (Morcego, nv 4), Cripta Esquecida (Esqueleto, nv 8).
@@ -54,7 +55,10 @@ Jogo idle de grind para celular (Android), com troca de itens entre jogadores nu
 ## Modo flutuante (visual)
 - Baseado no desenho do Marcel: personagens no chão, cerca baixa na frente (só os pés), mato perto do herói,
   contorno de montanha bem ao fundo; o meio entre os grupos fica vazado.
-- Meta futura: até 3 heróis contra 3 inimigos na cena (ir ajustando nos testes).
+- Entre um monstro e outro o grupo **anda**: o terreno (pedaços de chão com pontezinhas nos vãos, cerca, mato)
+  rola para trás, a montanha anda mais devagar (paralaxe) e o próximo monstro chega com o chão.
+  Usa a pausa `respawnMs` da simulação (2 s). Por enquanto só no modo flutuante.
+- Meta futura: até uns 8 personagens (ex.: 4 heróis contra 4 inimigos), com terreno sobrando atrás de cada grupo.
 
 ## Em aberto
 - Backend do hub de trocas (Cloudflare Workers + D1/Durable Objects é candidato).

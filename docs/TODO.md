@@ -18,6 +18,9 @@
 - [ ] Itens: drop, inventário, equipamento (equipar = trecho novo)
 - [x] PiP nativo no app (MainActivity.java + JanelinhaPlugin.java): entra sozinho ao sair do app e pelo botão Janelinha
 - [x] Modo flutuante (sobre outros apps): fundo vazado, ilha de chão, camadas em paralaxe, arrastar, tocar abre o jogo, notificação com Fechar
+- [x] Modo flutuante: caminhada entre monstros com terreno rolando e paralaxe
+- [ ] Caminhada também na tela do app (hoje o monstro novo cai do céu)
+- [ ] Grupo: vários heróis e vários inimigos (até ~8 na cena)
 - [ ] Modo flutuante: ajustar tamanho/posição salvos, toque atravessando a parte transparente, deixar o herói ainda maior
 - [ ] Notificação com o progresso (fase, ouro, abates)
 - [ ] Versão Play Store sem o modo flutuante, se a permissão for recusada na revisão

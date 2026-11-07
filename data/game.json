@@ -146,7 +146,7 @@
   "rules": {
     "baseAttack": 6, "attackPerLevel": 3,
     "critChance": 0.12, "critMult": 2.0,
-    "respawnMs": 900,
+    "respawnMs": 2000,
     "xpToLevel": { "base": 15, "exp": 1.8 },
     "_levelCap": "acima do levelCap da fase, cada abate dá só 1 de XP"
   }

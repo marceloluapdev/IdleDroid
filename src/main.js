@@ -8,7 +8,7 @@
   const CLOCK_KEY = "idle.relogio";      // atraso/avanço do relógio (menu admin)
   const $ = id => document.getElementById(id);
 
-  const data = await (await fetch("data/game.json?v=1")).json();
+  const data = await (await fetch("data/game.json?v=2")).json();
 
   let clockOffset = 0;
   try { clockOffset = +localStorage.getItem(CLOCK_KEY) || 0; } catch (e) {}

@@ -4,7 +4,7 @@
 (async function () {
   "use strict";
 
-  const data = await (await fetch("data/game.json?v=1")).json();
+  const data = await (await fetch("data/game.json?v=2")).json();
 
   // No app o save vem da "Ponte" nativa (FlutuanteService.java); no navegador, do localStorage.
   const ler = (metodo, chave) => {

@@ -141,7 +141,8 @@
 
   // ---------- Geometria da cena ----------
   Player.prototype.heroPos = function (now) {
-    return { x: HERO_X, y: FLOOR - this.hero.height + (Math.floor(now / 450) % 2) };
+    const passo = this.walkP > 0 && this.walkP < 1 ? Math.floor(now / 110) % 2 : Math.floor(now / 450) % 2;
+    return { x: HERO_X, y: FLOOR - this.hero.height + passo };
   };
   Player.prototype.tip = function (now) {
     const h = this.heroPos(now), t = this.data.hero.sprite.staffTip;
@@ -162,7 +163,7 @@
   Player.prototype.onEvents = function (fired, now) {
     for (const e of fired) {
       if (e.type === "kill") this.deathT = e.t;
-      if (e.type === "spawn") this.spawnT = e.t;
+      if (e.type === "spawn") { this.spawnT = e.t; this.walks = (this.walks || 0) + 1; }
       if (e.type === "levelup") { this.levelT = e.t; this.level = e.level; }
       if (e.type === "hit") this.lastHitT = e.t;
       if (now - e.t > 2500) continue;
@@ -175,6 +176,7 @@
     const g = this.g, data = this.data;
     const stage = data.stages.find(s => s.id === view.stageId) || data.stages[0];
     this.level = view.level;
+    this.updateWalk(now);
 
     // tremida de tela: soma das pancadas recentes
     let shake = 0;
@@ -224,6 +226,10 @@
     if (now - this.lastHitT < 140) dx += 2;
 
     if (dead) {
+      // modo flutuante: o próximo monstro vem chegando com o terreno durante a caminhada
+      if (this.opts.transparente && this.walkP > 0) {
+        g.drawImage(m.img, Math.round(x + PERIODO * (1 - this.walkP)), y);
+      }
       // some em pontilhado e afunda
       const p = clamp01(sinceDeath / 450);
       if (p >= 1) return;
@@ -237,7 +243,7 @@
       g.drawImage(tmp, x + dx, y + dy + Math.round(p * 4));
       return;
     }
-    if (sinceSpawn >= 0 && sinceSpawn < 260) dy -= Math.round((1 - easeOut(sinceSpawn / 260)) * 30);
+    if (!this.opts.transparente && sinceSpawn >= 0 && sinceSpawn < 260) dy -= Math.round((1 - easeOut(sinceSpawn / 260)) * 30);
     g.drawImage(img, Math.round(x + dx), Math.round(y + dy), Math.round(sw), Math.round(sh));
 
     // barra de vida
@@ -369,7 +375,8 @@
   // ---------- Modo flutuante: camadas (desenho do Marcel) ----------
   // Fundo: montanha bem atrás, passando devagar. Chão só embaixo do herói e do monstro
   // (o meio fica vazado). Frente: cerca de madeira e mato perto do herói.
-  const CERCA_HEROI = [4, 60];                 // trecho de cerca na frente do herói
+  const PERIODO = 160;                           // um "pedaço" de terreno = uma tela
+  const CERCA_HEROI = [4, 60];                   // trecho de cerca na frente do herói
   const CERCA_MONSTRO = [[96, 108], [133, 157]]; // dos lados do monstro (não cobre ele)
 
   Player.prototype.mountains = function (stage) {
@@ -410,7 +417,34 @@
     this.px(b.floor, x0 + 2, FLOOR + 4, x1 - x0 - 4, 1);
   };
 
-  // Cerca baixa: só cobre os pés (estacas de 5 px, uma tábua fina)
+  // Pontezinha de tábuas nos vãos: o meio continua vazado, mas o herói tem onde pisar
+  Player.prototype.drawBridge = function (x0, x1) {
+    for (let x = x0; x < x1; x += 3) {
+      this.px("ink", x, FLOOR, 3, 2);
+      this.px("wood", x, FLOOR, 2, 1);
+    }
+  };
+
+  // Caminhada entre monstros: o monstro some (450 ms), o grupo anda um PERIODO inteiro
+  // até o próximo, que chega com o terreno. Usa o tempo de "respawnMs" da simulação.
+  Player.prototype.updateWalk = function (now) {
+    this.walkP = 0;
+    if (!this.opts.transparente) return;
+    const dead = this.deathT > this.spawnT;
+    if (dead) {
+      const ini = this.deathT + 450, fim = this.deathT + this.data.rules.respawnMs;
+      const p = clamp01((now - ini) / Math.max(1, fim - ini));
+      this.walkP = p < 0.5 ? 2 * p * p : 1 - 2 * (1 - p) * (1 - p);   // acelera e freia
+    }
+    this.cam = ((this.walks || 0) % 64) * PERIODO + this.walkP * PERIODO;
+  };
+
+  // Desenha uma coisa do terreno (em coordenadas do pedaço) em todas as cópias visíveis
+  Player.prototype.eachPeriod = function (fn) {
+    const off = -(this.cam % PERIODO);
+    for (let base = off; base < W; base += PERIODO) fn(Math.round(base));
+  };
+
   Player.prototype.drawFence = function (x0, x1) {
     const top = FLOOR - 3;
     this.px("wood", x0, top + 2, x1 - x0, 1);
@@ -425,25 +459,31 @@
     g.save();
     // a montanha some nas pontas, para não virar um retângulo
     g.beginPath(); g.rect(2, 0, W - 4, FLOOR); g.clip();
-    this.drawStrip(this.mountains(stage), now * 0.003);
+    this.drawStrip(this.mountains(stage), this.cam * 0.12 + now * 0.001);
     g.restore();
-    this.drawGround(stage, 2, 64);
-    this.drawGround(stage, 92, 158);
+    this.eachPeriod(b => {
+      this.drawGround(stage, b + 2, b + 64);
+      this.drawGround(stage, b + 92, b + 158);
+      this.drawBridge(b + 62, b + 94);
+      this.drawBridge(b + 156, b + 164);
+    });
   };
 
   Player.prototype.drawFrontLayer = function (now, stage) {
     // mato perto do herói, balançando
     const sway = Math.round(Math.sin(now / 500));
     const tufos = [[6, 6], [12, 4], [40, 5], [46, 7], [53, 4], [99, 4], [150, 5]];
-    for (const [x, h] of tufos) {
-      for (let k = 0; k < 3; k++) {
-        const hh = h - (k === 1 ? 0 : 2);
-        this.px(k === 1 ? "green" : "greenD", x + k * 2 + (k === 1 ? sway : 0), FLOOR + 2 - hh, 1, hh);
+    this.eachPeriod(base => {
+      for (const [x, h] of tufos) {
+        for (let k = 0; k < 3; k++) {
+          const hh = h - (k === 1 ? 0 : 2);
+          this.px(k === 1 ? "green" : "greenD", base + x + k * 2 + (k === 1 ? sway : 0), FLOOR + 2 - hh, 1, hh);
+        }
       }
-    }
-    // cerca na frente
-    this.drawFence(CERCA_HEROI[0], CERCA_HEROI[1]);
-    for (const [a, b] of CERCA_MONSTRO) this.drawFence(a, b);
+      // cerca na frente
+      this.drawFence(base + CERCA_HEROI[0], base + CERCA_HEROI[1]);
+      for (const [a, b] of CERCA_MONSTRO) this.drawFence(base + a, base + b);
+    });
     // folhas/poeira passando na frente
     const col = stage.bg.deco === "trees" ? "green" : stage.bg.deco === "graves" ? "lilac" : "gray";
     for (let i = 0; i < 5; i++) {
