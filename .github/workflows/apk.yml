@@ -1,0 +1,68 @@
+# Gera o APK do IdleDroid a cada envio na dev ou na main e publica em Releases.
+# Precisa dos segredos KEYSTORE_BASE64, KEYSTORE_PASSWORD, KEY_ALIAS e KEY_PASSWORD (ver docs/ANDROID.md).
+name: APK
+
+on:
+  push:
+    branches: [dev, main]
+    paths-ignore: ["docs/**", "**.md"]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  apk:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+
+      - name: Instalar e copiar o jogo para o app
+        run: |
+          npm ci
+          npm run sync
+
+      - name: Verificar segredos da chave
+        env:
+          KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
+        run: |
+          if [ -z "$KEYSTORE_BASE64" ]; then
+            echo "::error::Faltam os segredos da chave de assinatura. Veja docs/ANDROID.md."
+            exit 1
+          fi
+          echo "$KEYSTORE_BASE64" | base64 -d > "$RUNNER_TEMP/idledroid.keystore"
+
+      - name: Gerar APK
+        working-directory: android
+        env:
+          KEYSTORE_FILE: ${{ runner.temp }}/idledroid.keystore
+          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+          VERSION_CODE: ${{ github.run_number }}
+        run: |
+          chmod +x gradlew
+          ./gradlew assembleRelease --no-daemon
+          cp app/build/outputs/apk/release/app-release.apk "$RUNNER_TEMP/IdleDroid.apk"
+
+      - name: Publicar em Releases
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          TAG="${{ github.ref_name }}-${{ github.run_number }}"
+          FLAG=""
+          if [ "${{ github.ref_name }}" != "main" ]; then FLAG="--prerelease"; fi
+          gh release create "$TAG" "$RUNNER_TEMP/IdleDroid.apk" \
+            --target "${{ github.sha }}" $FLAG \
+            --title "IdleDroid ${{ github.ref_name }} #${{ github.run_number }}" \
+            --notes "APK gerado do commit ${{ github.sha }}. Instale com: adb install -r IdleDroid.apk"

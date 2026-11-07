@@ -8,15 +8,17 @@
 - [x] Escolha de fase (liberada por nível)
 - [x] Menu `?admin`: avançar tempo, sair por 8 h, zerar
 - [x] Experimento de janelinha (PiP) só com web
+- [x] App Android com Capacitor + APK assinado gerado pelo GitHub Actions (ver ANDROID.md)
 
 ## Próximos
 - [ ] Testar o botão Janelinha no Chrome do Android (anotar se funciona e se congela fora da aba)
 - [ ] Limite de ganho offline e balanceamento de XP/ouro
 - [ ] Monstros revidando (vida do herói, derrota/recuo)
 - [ ] Itens: drop, inventário, equipamento (equipar = trecho novo)
-- [ ] Empacotar com Capacitor e fazer o PiP nativo
+- [ ] PiP nativo no app
 - [ ] Notificação persistente com o progresso
 - [ ] Portar `sim.js` + `player.js` para Kotlin e fazer o Live Wallpaper
 - [ ] Teste que compara a luta do JS com a do Kotlin (mesma semente → mesmos eventos)
+- [ ] Conta de distribuição limitada (amigos, até 20 aparelhos) e registrar o pacote
 - [ ] Hub de trocas (servidor) e validação do loot refazendo o cálculo
 - [ ] Trocar sprites de grade por spritesheets (PixelLab ou arte gratuita)

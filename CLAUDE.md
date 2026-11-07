@@ -7,6 +7,7 @@ testável no navegador mobile.
 Leia só quando precisar:
 - `docs/GAME.md` — conceito, arquitetura (luta calculada por trechos + dados), decisões
 - `docs/TODO.md` — próximos passos e o que já foi feito
+- `docs/ANDROID.md` — app Android (Capacitor), APK no GitHub Actions, chave de assinatura, instalação
 
 Antes de propor algo de design ou arquitetura, leia o GAME.md e o TODO.md.
 
@@ -23,6 +24,9 @@ Branches: trabalhe sempre na `dev`. A `main` é a versão estável publicada no 
 (https://marceloluapdev.github.io/IdleDroid/). Só leve a `dev` para a `main` quando o Marcel pedir,
 depois de ele testar no celular. Prévia da `dev` no celular:
 https://raw.githack.com/marceloluapdev/IdleDroid/dev/index.html?admin
+
+App Android: `android/` é gerado pelo Capacitor (só edite o nativo de propósito). Depois de mudar o jogo,
+não precisa fazer nada: o Actions roda `npm run sync` e gera o APK. Não crie arquivos dentro de `www/`.
 
 Teste manual no celular: abra com `?admin` (fica ligado no aparelho; `?admin=off` desliga).
 Ao criar mecânica nova, adicione um atalho no menu de `src/admin.js`.

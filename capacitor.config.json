@@ -1,0 +1,8 @@
+{
+  "appId": "io.github.marceloluapdev.idledroid",
+  "appName": "IdleDroid",
+  "webDir": "www",
+  "android": {
+    "backgroundColor": "#14101f"
+  }
+}
