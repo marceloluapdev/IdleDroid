@@ -19,6 +19,11 @@ Convenções:
 - Paleta fixa: as cores de `data/game.json` (espelhadas em `:root` no `src/style.css`). Use só essas.
 - Textos do jogo em português.
 
+Branches: trabalhe sempre na `dev`. A `main` é a versão estável publicada no GitHub Pages
+(https://marceloluapdev.github.io/IdleDroid/). Só leve a `dev` para a `main` quando o Marcel pedir,
+depois de ele testar no celular. Prévia da `dev` no celular:
+https://raw.githack.com/marceloluapdev/IdleDroid/dev/index.html?admin
+
 Teste manual no celular: abra com `?admin` (fica ligado no aparelho; `?admin=off` desliga).
 Ao criar mecânica nova, adicione um atalho no menu de `src/admin.js`.
 
