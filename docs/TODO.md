@@ -20,6 +20,7 @@
 - [ ] Notificação persistente com o progresso
 - [ ] Portar `sim.js` + `player.js` para Kotlin e fazer o Live Wallpaper
 - [ ] Teste que compara a luta do JS com a do Kotlin (mesma semente → mesmos eventos)
+- [ ] Antes dos amigos: `ADMIN_PADRAO = false` em `src/admin.js` (esconder o menu ⚙)
 - [ ] Conta de distribuição limitada (amigos, até 20 aparelhos) e registrar o pacote
 - [ ] Hub de trocas (servidor) e validação do loot refazendo o cálculo
 - [ ] Trocar sprites de grade por spritesheets (PixelLab ou arte gratuita)

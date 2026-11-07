@@ -70,15 +70,16 @@ def caso_save_sobrevive_ao_recarregar(p):
     assert depois["gold"] >= antes["gold"] and depois["level"] >= antes["level"], (antes, depois)
 
 
-def caso_sete_toques_em_nivel_ligam_o_admin(p):
+def caso_admin_visivel_por_padrao_e_sete_toques_alternam(p):
     p.evaluate("localStorage.removeItem('idle.admin')")
     p.goto(p.url.split("?")[0])
     p.wait_for_function("window.IdleAdmin && IdleAdmin.fight")
-    assert p.locator(".admin").count() == 0
+    assert p.locator(".admin").count() == 1, "admin deveria aparecer por padrão"
     for _ in range(7):
         p.click(".hud-row.small span >> nth=0")
     p.wait_for_function("window.IdleAdmin && IdleAdmin.fight")
-    p.wait_for_selector(".admin")
+    p.wait_for_timeout(200)
+    assert p.locator(".admin").count() == 0, "7 toques deveriam desligar"
 
 
 def main():

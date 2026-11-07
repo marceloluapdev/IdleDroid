@@ -28,8 +28,8 @@ https://raw.githack.com/marceloluapdev/IdleDroid/dev/index.html?admin
 App Android: `android/` é gerado pelo Capacitor (só edite o nativo de propósito). Depois de mudar o jogo,
 não precisa fazer nada: o Actions roda `npm run sync` e gera o APK. Não crie arquivos dentro de `www/`.
 
-Teste manual no celular: abra com `?admin` (fica ligado no aparelho; `?admin=off` desliga).
-No app Android: 7 toques rápidos em "Nível" ligam/desligam o menu.
+Menu de teste (⚙): por enquanto aparece por padrão (`ADMIN_PADRAO` em `src/admin.js`).
+`?admin=off` desliga, `?admin` liga; no app, 7 toques rápidos em "Nível" alternam.
 Ao criar mecânica nova, adicione um atalho no menu de `src/admin.js`.
 
 Ao mudar CSS/JS/JSON, aumente o `?v=N` deles no `index.html` (e o do `fetch` em `main.js` para o JSON).

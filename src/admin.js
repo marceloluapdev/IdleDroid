@@ -1,14 +1,24 @@
-// Menu de teste: abra o jogo com ?admin (fica ligado no aparelho; ?admin=off desliga).
-// No app (sem barra de endereço): toque 7 vezes seguidas em "Nível" para ligar/desligar.
+// Menu de teste. POR ENQUANTO fica ligado por padrão (fase de desenvolvimento).
+// Antes de os amigos testarem, voltar para desligado por padrão (ver docs/TODO.md).
+// ?admin=off desliga e ?admin liga (fica salvo no aparelho);
+// no app, 7 toques rápidos em "Nível" alternam.
 // Ao criar mecânica nova, adicione aqui um atalho para testá-la.
 
 (function () {
   "use strict";
   const q = location.search;
   try {
-    if (/[?&]admin=off\b/.test(q)) localStorage.removeItem("idle.admin");
+    if (/[?&]admin=off\b/.test(q)) localStorage.setItem("idle.admin", "0");
     else if (/[?&]admin\b/.test(q)) localStorage.setItem("idle.admin", "1");
   } catch (e) {}
+  const ADMIN_PADRAO = true;   // trocar para false antes de distribuir
+  function ligado() {
+    try {
+      const v = localStorage.getItem("idle.admin");
+      return v === null ? ADMIN_PADRAO : v === "1";
+    } catch (e) { return ADMIN_PADRAO; }
+  }
+
   // 7 toques rápidos em "Nível" liga/desliga o menu (para o app Android)
   let toques = 0, ultimo = 0;
   document.addEventListener("click", ev => {
@@ -19,15 +29,12 @@
     if (toques < 7) return;
     toques = 0;
     try {
-      if (localStorage.getItem("idle.admin") === "1") localStorage.removeItem("idle.admin");
-      else localStorage.setItem("idle.admin", "1");
+      localStorage.setItem("idle.admin", ligado() ? "0" : "1");
     } catch (e) {}
     location.reload();
   });
 
-  let on = false;
-  try { on = localStorage.getItem("idle.admin") === "1"; } catch (e) {}
-  if (!on) return;
+  if (!ligado()) return;
 
   const acoes = {
     "Avançar 1 min": () => IdleAdmin.skip(60e3),
