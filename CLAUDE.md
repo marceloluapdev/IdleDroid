@@ -13,7 +13,7 @@ Antes de propor algo de design ou arquitetura, leia o GAME.md e o TODO.md.
 
 Convenções:
 - `src/sim.js` = simulação determinística (sem Date.now, sem Math.random; tudo pela semente).
-  Vai ser portada para Kotlin (wallpaper): mantenha simples e sem dependências.
+  Portada para Java em `android/.../Sim.java` (papel de parede): mudou um, mude o outro igual (SimTest confere).
 - `src/player.js` = tocador: só desenha eventos da simulação; não decide nada.
 - `src/main.js` = save, relógio, HUD, fases, janelinha. `src/admin.js` = menu de teste.
 - `data/game.json` = conteúdo (paleta, sprites, monstros, fases, magias, regras). Magia nova = dados, não código.

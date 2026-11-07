@@ -18,6 +18,17 @@ wallpaper) entram depois em `android/`.
 - Ao voltar para o jogo (onResume) o modo flutuante fecha.
 - Play Store: a permissão de sobreposição tem de ser recurso divulgado na ficha e ter alternativa (a Janelinha).
 
+## Papel de parede animado (tela de bloqueio)
+- `IdleWallpaperService.java`: papel de parede; lê o save das SharedPreferences (o jogo grava a cada salvamento)
+  e o `game.json` dos assets. Anima a 20 quadros/s só com a tela visível.
+- `Sim.java`: porte linha a linha de `src/sim.js`. **Mudou a simulação no JS? Mude igual no Java.**
+  O `SimTest` (JUnit) compara com eventos gerados por `tools/gerar-fixture-sim.js` e roda no Actions.
+  Local: `node tools/gerar-fixture-sim.js` e compilar com javac + JUnit.
+- `Cena.java`: porte do desenho (céu, montanha, chão em pedaços com pontes, cerca, mato, sprites, magias,
+  números de dano, moedas, subida de nível, caminhada). Lê sprites e magias do `game.json`.
+- `Json.java`: leitor de JSON sem dependências (para rodar em Java puro nos testes).
+- Botão "Papel de parede" no jogo abre a tela do sistema já com o IdleDroid escolhido.
+
 ## Como o APK é gerado
 - `npm run sync` copia o jogo (`index.html`, `src/`, `data/`, `assets/`) para `www/` e atualiza `android/`.
 - O GitHub Actions (`.github/workflows/apk.yml`) roda a cada envio na `dev` ou na `main`,

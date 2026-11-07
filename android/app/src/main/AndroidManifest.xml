@@ -44,10 +44,24 @@
                 android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE"
                 android:value="Mostra o personagem do jogo lutando por cima de outros apps enquanto o usuário quiser" />
         </service>
+        <!-- Papel de parede animado: a luta na tela de bloqueio -->
+        <service
+            android:name=".IdleWallpaperService"
+            android:exported="true"
+            android:label="@string/wallpaper_nome"
+            android:permission="android.permission.BIND_WALLPAPER">
+            <intent-filter>
+                <action android:name="android.service.wallpaper.WallpaperService" />
+            </intent-filter>
+            <meta-data
+                android:name="android.service.wallpaper"
+                android:resource="@xml/idledroid_wallpaper" />
+        </service>
     </application>
 
     <!-- Permissions -->
 
+    <uses-feature android:name="android.software.live_wallpaper" android:required="false" />
     <uses-permission android:name="android.permission.INTERNET" />
     <!-- Modo flutuante (herói por cima dos outros apps) -->
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />

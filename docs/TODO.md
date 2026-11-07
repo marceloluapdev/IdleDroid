@@ -24,8 +24,9 @@
 - [ ] Modo flutuante: ajustar tamanho/posição salvos, toque atravessando a parte transparente, deixar o herói ainda maior
 - [ ] Notificação com o progresso (fase, ouro, abates)
 - [ ] Versão Play Store sem o modo flutuante, se a permissão for recusada na revisão
-- [ ] Portar `sim.js` + `player.js` para Kotlin e fazer o Live Wallpaper
-- [ ] Teste que compara a luta do JS com a do Kotlin (mesma semente → mesmos eventos)
+- [x] Papel de parede animado (tela de bloqueio): Sim.java + Cena.java + IdleWallpaperService.java, botão "Papel de parede"
+- [x] Teste SimTest (JUnit) compara a luta do Java com a do JS (roda no Actions antes do APK)
+- [ ] Testar o papel de parede no bloqueio do HyperOS (Xiaomi)
 - [ ] Antes dos amigos: `ADMIN_PADRAO = false` em `src/admin.js` (esconder o menu ⚙)
 - [ ] Conta de distribuição limitada (amigos, até 20 aparelhos) e registrar o pacote
 - [ ] Hub de trocas (servidor) e validação do loot refazendo o cálculo

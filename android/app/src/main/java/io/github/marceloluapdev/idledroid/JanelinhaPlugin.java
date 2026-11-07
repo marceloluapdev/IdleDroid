@@ -1,5 +1,8 @@
 package io.github.marceloluapdev.idledroid;
 
+import android.app.WallpaperManager;
+import android.content.ActivityNotFoundException;
+import android.content.ComponentName;
 import android.content.Intent;
 import android.net.Uri;
 import android.provider.Settings;
@@ -57,6 +60,26 @@ public class JanelinhaPlugin extends Plugin {
             tela().pedirNotificacao();
             call.resolve();
         });
+    }
+
+    /** Abre a tela do sistema para aplicar o papel de parede animado do IdleDroid. */
+    @PluginMethod
+    public void papelDeParede(PluginCall call) {
+        Intent i = new Intent(WallpaperManager.ACTION_CHANGE_LIVE_WALLPAPER)
+            .putExtra(WallpaperManager.EXTRA_LIVE_WALLPAPER_COMPONENT,
+                new ComponentName(getContext(), IdleWallpaperService.class));
+        try {
+            getActivity().startActivity(i);
+        } catch (ActivityNotFoundException e) {
+            // Alguns celulares só têm a lista geral de papéis de parede animados
+            try {
+                getActivity().startActivity(new Intent(WallpaperManager.ACTION_LIVE_WALLPAPER_CHOOSER));
+            } catch (ActivityNotFoundException e2) {
+                call.reject("Este celular não abriu a tela de papel de parede animado.");
+                return;
+            }
+        }
+        call.resolve();
     }
 
     /** Abre a tela do sistema "Sobrepor a outros apps" deste app. */

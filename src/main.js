@@ -182,6 +182,15 @@
   };
   $("flut-perm-nao").onclick = () => { $("flut-perm").hidden = true; };
 
+  // ---------- Papel de parede animado (só no app) ----------
+  // A luta na tela de bloqueio (IdleWallpaperService.java). Lê o mesmo save.
+  $("btn-parede").hidden = !nativo;
+  $("btn-parede").onclick = async () => {
+    writeSave();
+    try { await Cap.nativePromise("Janelinha", "papelDeParede", {}); }
+    catch (e) { alert("Não consegui abrir o papel de parede: " + e.message); }
+  };
+
   // ---------- Menu de administrador (?admin) ----------
   window.IdleAdmin = {
     data, get fight() { return fight; }, now,

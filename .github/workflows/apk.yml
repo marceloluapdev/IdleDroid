@@ -31,6 +31,7 @@ jobs:
         run: |
           npm ci
           npm run sync
+          node tools/gerar-fixture-sim.js
 
       - name: Verificar segredos da chave
         env:
@@ -52,7 +53,8 @@ jobs:
           VERSION_CODE: ${{ github.run_number }}
         run: |
           chmod +x gradlew
-          ./gradlew assembleRelease --no-daemon
+          # o teste confere que a luta em Java (papel de parede) é idêntica à do JS
+          ./gradlew testReleaseUnitTest assembleRelease --no-daemon
           cp app/build/outputs/apk/release/app-release.apk "$RUNNER_TEMP/IdleDroid.apk"
 
       - name: Publicar em Releases

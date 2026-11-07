@@ -94,6 +94,7 @@ def caso_janelinha_mostra_so_a_luta(p):
 
 def caso_flutuar_so_aparece_no_app(p):
     assert p.is_hidden("#btn-flutuar")
+    assert p.is_hidden("#btn-parede")
 
 
 def caso_tela_flutuante_tem_fundo_vazado(p):

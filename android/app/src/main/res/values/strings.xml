@@ -4,4 +4,6 @@
     <string name="title_activity_main">IdleDroid</string>
     <string name="package_name">io.github.marceloluapdev.idledroid</string>
     <string name="custom_url_scheme">io.github.marceloluapdev.idledroid</string>
+    <string name="wallpaper_nome">IdleDroid</string>
+    <string name="wallpaper_descricao">O herói do IdleDroid lutando na tela de bloqueio</string>
 </resources>
